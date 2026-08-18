@@ -1,0 +1,377 @@
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { Album, BookingFormData, EventItem, MinistryInfo, PrayerRequestData, ScriptureItem, Testimony, Track } from '../types';
+import { initialAlbums, initialEvents, initialMinistryInfo, initialScriptures, initialTestimonies, initialTracks } from '../data/initialContent';
+import { worshipAudio } from '../utils/audioSynth';
+
+interface MinistryContextType {
+  ministryInfo: MinistryInfo;
+  tracks: Track[];
+  albums: Album[];
+  events: EventItem[];
+  scriptures: ScriptureItem[];
+  testimonies: Testimony[];
+  
+  // Customization & editing methods
+  updateMinistryInfo: (info: Partial<MinistryInfo>) => void;
+  updateTracks: (tracks: Track[]) => void;
+  updateEvents: (events: EventItem[]) => void;
+  updateScriptures: (scriptures: ScriptureItem[]) => void;
+  resetToDefaults: () => void;
+  exportContentJson: () => void;
+  importContentJson: (jsonData: string) => boolean;
+
+  // Music Player State
+  currentTrack: Track;
+  isPlaying: boolean;
+  playbackProgress: number; // 0 to 100
+  currentSeconds: number;
+  volume: number;
+  isMuted: boolean;
+  playTrack: (track: Track) => void;
+  togglePlay: () => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
+  seekProgress: (percent: number) => void;
+  setVolume: (vol: number) => void;
+  toggleMute: () => void;
+
+  // Modals & UI states
+  isLyricsModalOpen: boolean;
+  setIsLyricsModalOpen: (open: boolean) => void;
+  lyricsTrack: Track | null;
+  openLyrics: (track: Track) => void;
+
+  isChordsModalOpen: boolean;
+  setIsChordsModalOpen: (open: boolean) => void;
+  chordsTrack: Track | null;
+  openChords: (track: Track) => void;
+
+  isEditorOpen: boolean;
+  setIsEditorOpen: (open: boolean) => void;
+
+  isBookingSuccessModalOpen: boolean;
+  setIsBookingSuccessModalOpen: (open: boolean) => void;
+  lastBookingSubmission: BookingFormData | null;
+  submitBooking: (data: BookingFormData) => Promise<boolean>;
+
+  submitPrayerRequest: (data: PrayerRequestData) => Promise<boolean>;
+  toastMessage: string | null;
+  showToast: (msg: string) => void;
+}
+
+const MinistryContext = createContext<MinistryContextType | undefined>(undefined);
+
+const STORAGE_KEY = "dekings_ministry_content_v1";
+
+export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Load saved content or defaults
+  const [ministryInfo, setMinistryInfo] = useState<MinistryInfo>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY + "_info");
+    return saved ? JSON.parse(saved) : initialMinistryInfo;
+  });
+
+  const [tracks, setTracks] = useState<Track[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY + "_tracks");
+    return saved ? JSON.parse(saved) : initialTracks;
+  });
+
+  const [albums] = useState<Album[]>(initialAlbums);
+
+  const [events, setEvents] = useState<EventItem[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY + "_events");
+    return saved ? JSON.parse(saved) : initialEvents;
+  });
+
+  const [scriptures, setScriptures] = useState<ScriptureItem[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY + "_scriptures");
+    return saved ? JSON.parse(saved) : initialScriptures;
+  });
+
+  const [testimonies] = useState<Testimony[]>(initialTestimonies);
+
+  // Music Player States
+  const [currentTrack, setCurrentTrack] = useState<Track>(tracks[0] || initialTracks[0]);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [currentSeconds, setCurrentSeconds] = useState<number>(0);
+  const [volume, setAudioVolume] = useState<number>(0.85);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+
+  // Modals
+  const [isLyricsModalOpen, setIsLyricsModalOpen] = useState(false);
+  const [lyricsTrack, setLyricsTrack] = useState<Track | null>(null);
+
+  const [isChordsModalOpen, setIsChordsModalOpen] = useState(false);
+  const [chordsTrack, setChordsTrack] = useState<Track | null>(null);
+
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isBookingSuccessModalOpen, setIsBookingSuccessModalOpen] = useState(false);
+  const [lastBookingSubmission, setLastBookingSubmission] = useState<BookingFormData | null>(null);
+
+  // Toast
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(prev => (prev === msg ? null : prev));
+    }, 4000);
+  };
+
+  // Sync to local storage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY + "_info", JSON.stringify(ministryInfo));
+  }, [ministryInfo]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY + "_tracks", JSON.stringify(tracks));
+  }, [tracks]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY + "_events", JSON.stringify(events));
+  }, [events]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY + "_scriptures", JSON.stringify(scriptures));
+  }, [scriptures]);
+
+  // Audio timer simulation for realistic progress bar & synth pad playback
+  useEffect(() => {
+    let interval: number | null = null;
+    if (isPlaying) {
+      interval = window.setInterval(() => {
+        setCurrentSeconds(prev => {
+          if (prev >= currentTrack.durationSeconds) {
+            // Auto advance or loop
+            nextTrack();
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    } else {
+      if (interval) clearInterval(interval);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPlaying, currentTrack]);
+
+  const playTrack = (track: Track) => {
+    setCurrentTrack(track);
+    setCurrentSeconds(0);
+    setIsPlaying(true);
+    worshipAudio.playTrack(track.id, track.key);
+    worshipAudio.setVolume(isMuted ? 0 : volume);
+    showToast(`Now Playing: ${track.title}`);
+  };
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      pauseTrack();
+    } else {
+      resumeTrack();
+    }
+  };
+
+  const pauseTrack = () => {
+    setIsPlaying(false);
+    worshipAudio.pause();
+  };
+
+  const resumeTrack = () => {
+    setIsPlaying(true);
+    worshipAudio.playTrack(currentTrack.id, currentTrack.key);
+    worshipAudio.setVolume(isMuted ? 0 : volume);
+  };
+
+  const nextTrack = () => {
+    const currentIndex = tracks.findIndex(t => t.id === currentTrack.id);
+    const nextIndex = (currentIndex + 1) % tracks.length;
+    const next = tracks[nextIndex];
+    playTrack(next);
+  };
+
+  const prevTrack = () => {
+    const currentIndex = tracks.findIndex(t => t.id === currentTrack.id);
+    const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+    const prev = tracks[prevIndex];
+    playTrack(prev);
+  };
+
+  const seekProgress = (percent: number) => {
+    const targetSeconds = Math.floor((percent / 100) * currentTrack.durationSeconds);
+    setCurrentSeconds(targetSeconds);
+  };
+
+  const setVolume = (vol: number) => {
+    setAudioVolume(vol);
+    if (isMuted && vol > 0) setIsMuted(false);
+    worshipAudio.setVolume(vol);
+  };
+
+  const toggleMute = () => {
+    if (isMuted) {
+      setIsMuted(false);
+      worshipAudio.setVolume(volume);
+    } else {
+      setIsMuted(true);
+      worshipAudio.setVolume(0);
+    }
+  };
+
+  const openLyrics = (track: Track) => {
+    setLyricsTrack(track);
+    setIsLyricsModalOpen(true);
+  };
+
+  const openChords = (track: Track) => {
+    setChordsTrack(track);
+    setIsChordsModalOpen(true);
+  };
+
+  const updateMinistryInfo = (info: Partial<MinistryInfo>) => {
+    setMinistryInfo(prev => ({ ...prev, ...info }));
+    showToast("Ministry information updated successfully.");
+  };
+
+  const updateTracks = (newTracks: Track[]) => {
+    setTracks(newTracks);
+    showToast("Music tracks database updated.");
+  };
+
+  const updateEvents = (newEvents: EventItem[]) => {
+    setEvents(newEvents);
+    showToast("Ministry events schedule updated.");
+  };
+
+  const updateScriptures = (newScriptures: ScriptureItem[]) => {
+    setScriptures(newScriptures);
+    showToast("Scripture reflections updated.");
+  };
+
+  const resetToDefaults = () => {
+    setMinistryInfo(initialMinistryInfo);
+    setTracks(initialTracks);
+    setEvents(initialEvents);
+    setScriptures(initialScriptures);
+    localStorage.removeItem(STORAGE_KEY + "_info");
+    localStorage.removeItem(STORAGE_KEY + "_tracks");
+    localStorage.removeItem(STORAGE_KEY + "_events");
+    localStorage.removeItem(STORAGE_KEY + "_scriptures");
+    showToast("Reset all ministry content to initial template.");
+  };
+
+  const exportContentJson = () => {
+    const payload = {
+      ministryInfo,
+      tracks,
+      events,
+      scriptures,
+      exportedAt: new Date().toISOString(),
+      app: "De King's Family Music Ministry"
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `dekings_ministry_content_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("Downloaded ministry content JSON package.");
+  };
+
+  const importContentJson = (jsonData: string): boolean => {
+    try {
+      const parsed = JSON.parse(jsonData);
+      if (parsed.ministryInfo) setMinistryInfo(parsed.ministryInfo);
+      if (Array.isArray(parsed.tracks)) setTracks(parsed.tracks);
+      if (Array.isArray(parsed.events)) setEvents(parsed.events);
+      if (Array.isArray(parsed.scriptures)) setScriptures(parsed.scriptures);
+      showToast("Custom ministry content imported successfully!");
+      return true;
+    } catch {
+      showToast("Invalid JSON file format.");
+      return false;
+    }
+  };
+
+  const submitBooking = async (data: BookingFormData): Promise<boolean> => {
+    setLastBookingSubmission(data);
+    setIsBookingSuccessModalOpen(true);
+    showToast("Booking inquiry received! We will contact you within 24-48 hours.");
+    return true;
+  };
+
+  const submitPrayerRequest = async (data: PrayerRequestData): Promise<boolean> => {
+    showToast(`Prayer request for "${data.prayerSubject}" received. The ministry intercessors are praying!`);
+    return true;
+  };
+
+  const playbackProgress = currentTrack.durationSeconds > 0
+    ? Math.min(100, (currentSeconds / currentTrack.durationSeconds) * 100)
+    : 0;
+
+  return (
+    <MinistryContext.Provider
+      value={{
+        ministryInfo,
+        tracks,
+        albums,
+        events,
+        scriptures,
+        testimonies,
+        updateMinistryInfo,
+        updateTracks,
+        updateEvents,
+        updateScriptures,
+        resetToDefaults,
+        exportContentJson,
+        importContentJson,
+        currentTrack,
+        isPlaying,
+        playbackProgress,
+        currentSeconds,
+        volume,
+        isMuted,
+        playTrack,
+        togglePlay,
+        pauseTrack,
+        resumeTrack,
+        nextTrack,
+        prevTrack,
+        seekProgress,
+        setVolume,
+        toggleMute,
+        isLyricsModalOpen,
+        setIsLyricsModalOpen,
+        lyricsTrack,
+        openLyrics,
+        isChordsModalOpen,
+        setIsChordsModalOpen,
+        chordsTrack,
+        openChords,
+        isEditorOpen,
+        setIsEditorOpen,
+        isBookingSuccessModalOpen,
+        setIsBookingSuccessModalOpen,
+        lastBookingSubmission,
+        submitBooking,
+        submitPrayerRequest,
+        toastMessage,
+        showToast
+      }}
+    >
+      {children}
+    </MinistryContext.Provider>
+  );
+};
+
+export const useMinistry = () => {
+  const context = useContext(MinistryContext);
+  if (!context) {
+    throw new Error("useMinistry must be used within a MinistryProvider");
+  }
+  return context;
+};

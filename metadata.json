@@ -1,0 +1,6 @@
+{
+  "name": "De King's Family Music Ministry",
+  "description": "Smart, classic, responsive website for De King's Family Music Ministry featuring music showcase, booking, worship ministry, events, scripture, and gold/black branding.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
