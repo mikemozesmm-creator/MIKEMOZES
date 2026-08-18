@@ -51,6 +51,15 @@ interface MinistryContextType {
   isEditorOpen: boolean;
   setIsEditorOpen: (open: boolean) => void;
 
+  // Admin Security
+  isAdminMode: boolean;
+  isAdminAuthenticated: boolean;
+  isAdminLoginModalOpen: boolean;
+  setIsAdminLoginModalOpen: (open: boolean) => void;
+  loginAdmin: (password: string) => boolean;
+  logoutAdmin: () => void;
+  openCustomizer: () => void;
+
   isBookingSuccessModalOpen: boolean;
   setIsBookingSuccessModalOpen: (open: boolean) => void;
   lastBookingSubmission: BookingFormData | null;
@@ -63,7 +72,7 @@ interface MinistryContextType {
 
 const MinistryContext = createContext<MinistryContextType | undefined>(undefined);
 
-const STORAGE_KEY = "dekings_ministry_content_v1";
+const STORAGE_KEY = "dekings_ministry_content_v3";
 
 export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Load saved content or defaults
@@ -106,6 +115,60 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [chordsTrack, setChordsTrack] = useState<Track | null>(null);
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  // Admin & Security States
+  const [isAdminMode, setIsAdminMode] = useState<boolean>(() => {
+    return window.location.hash.toLowerCase().includes('admin');
+  });
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem("dekings_admin_auth") === "true";
+  });
+  const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hasAdmin = window.location.hash.toLowerCase().includes('admin');
+      setIsAdminMode(hasAdmin);
+      if (hasAdmin && !sessionStorage.getItem("dekings_admin_auth")) {
+        setIsAdminLoginModalOpen(true);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    if (window.location.hash.toLowerCase().includes('admin') && !sessionStorage.getItem("dekings_admin_auth")) {
+      setIsAdminLoginModalOpen(true);
+    }
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const loginAdmin = (password: string): boolean => {
+    if (password === 'mikemozes7777') {
+      setIsAdminAuthenticated(true);
+      sessionStorage.setItem("dekings_admin_auth", "true");
+      setIsAdminLoginModalOpen(false);
+      showToast("Access Granted: Welcome Admin!");
+      setIsEditorOpen(true);
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const logoutAdmin = () => {
+    setIsAdminAuthenticated(false);
+    sessionStorage.removeItem("dekings_admin_auth");
+    setIsEditorOpen(false);
+    showToast("Logged out of Admin Portal.");
+  };
+
+  const openCustomizer = () => {
+    if (isAdminAuthenticated) {
+      setIsEditorOpen(true);
+    } else {
+      setIsAdminLoginModalOpen(true);
+    }
+  };
   const [isBookingSuccessModalOpen, setIsBookingSuccessModalOpen] = useState(false);
   const [lastBookingSubmission, setLastBookingSubmission] = useState<BookingFormData | null>(null);
 
@@ -354,6 +417,13 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
         openChords,
         isEditorOpen,
         setIsEditorOpen,
+        isAdminMode,
+        isAdminAuthenticated,
+        isAdminLoginModalOpen,
+        setIsAdminLoginModalOpen,
+        loginAdmin,
+        logoutAdmin,
+        openCustomizer,
         isBookingSuccessModalOpen,
         setIsBookingSuccessModalOpen,
         lastBookingSubmission,

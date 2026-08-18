@@ -19,15 +19,14 @@ export const initialMinistryInfo: MinistryInfo = {
     youtube: "https://youtube.com/@dekingsfamilymusic",
     tiktok: "https://tiktok.com/@dekingsfamilymusic",
     twitter: "https://twitter.com/dekingsmusic",
-    whatsapp: "https://wa.me/18007495464"
+    whatsapp: "https://wa.me/2348039675034"
   },
   banking: {
-    bankName: "Kingdom Trust Bank / First National",
-    accountName: "De King's Family Music Ministry International",
-    accountNumber: "0192837465",
-    sortCode: "20-44-68",
-    swiftCode: "KTBUS33XXX",
-    purpose: "Ministry Outreach, Album Production & Kingdom Expansion"
+    bankName: "UBA",
+    accountName: "Michael Moses Otohinoyi",
+    accountNumber: "2156399377",
+    sortCode: "033281508",
+    purpose: "Ministry Outreach, Worship Production & Kingdom Expansion"
   }
 };
 

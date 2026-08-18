@@ -11,7 +11,7 @@ export const GivingSection: React.FC = () => {
   const handleCopyAccount = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(
-        `Bank: ${ministryInfo.banking.bankName}\nAccount Name: ${ministryInfo.banking.accountName}\nAccount No: ${ministryInfo.banking.accountNumber}\nSort Code: ${ministryInfo.banking.sortCode || ''}\nSWIFT: ${ministryInfo.banking.swiftCode || ''}`
+        `Bank: ${ministryInfo.banking.bankName}\nAccount Name: ${ministryInfo.banking.accountName}\nAccount No: ${ministryInfo.banking.accountNumber}\nSort Code: ${ministryInfo.banking.sortCode || ''}`
       );
       setCopiedBank(true);
       showToast("Bank giving details copied to clipboard!");
@@ -121,12 +121,6 @@ export const GivingSection: React.FC = () => {
                   <div className="flex justify-between border-b border-zinc-800/80 pb-2">
                     <span className="text-zinc-500">Sort Code:</span>
                     <span className="text-zinc-300">{ministryInfo.banking.sortCode}</span>
-                  </div>
-                )}
-                {ministryInfo.banking.swiftCode && (
-                  <div className="flex justify-between border-b border-zinc-800/80 pb-2">
-                    <span className="text-zinc-500">SWIFT / BIC:</span>
-                    <span className="text-zinc-300">{ministryInfo.banking.swiftCode}</span>
                   </div>
                 )}
                 <div className="flex justify-between pt-1">

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Music, Calendar, BookOpen, Heart, Sparkles, Phone, SlidersHorizontal, Volume2 } from 'lucide-react';
+import { Menu, X, Music, Calendar, BookOpen, Heart, Sparkles, Phone, SlidersHorizontal, Volume2, Lock, LogOut, ShieldCheck } from 'lucide-react';
 import { CrestLogo } from './CrestLogo';
 import { useMinistry } from '../context/MinistryContext';
 
 export const Navbar: React.FC = () => {
-  const { ministryInfo, isPlaying, currentTrack, togglePlay, setIsEditorOpen } = useMinistry();
+  const { isPlaying, currentTrack, togglePlay, isAdminMode, isAdminAuthenticated, logoutAdmin, openCustomizer } = useMinistry();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -79,16 +79,34 @@ export const Navbar: React.FC = () => {
             <span className="truncate max-w-[110px]">{isPlaying ? currentTrack.title : 'Listen'}</span>
           </button>
 
-          {/* Live Content Customizer Button */}
-          <button
-            onClick={() => setIsEditorOpen(true)}
-            title="Edit Ministry Info, Songs & Events"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-700/80 bg-zinc-900/90 text-xs text-zinc-300 hover:text-amber-300 hover:border-amber-500/50 transition-all cursor-pointer"
-            id="edit-content-btn"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-[#d4af37]" />
-            <span>Customize</span>
-          </button>
+          {/* Admin Customizer Button - Only visible in Admin Mode (/#admin) or when authenticated */}
+          {(isAdminMode || isAdminAuthenticated) && (
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={openCustomizer}
+                title="Edit Ministry Info, Songs & Events"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#d4af37]/60 bg-[#1c180e] text-xs text-[#fce999] hover:brightness-125 shadow-[0_0_15px_rgba(212,175,55,0.25)] transition-all cursor-pointer font-medium"
+                id="edit-content-btn"
+              >
+                {isAdminAuthenticated ? (
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#d4af37]" />
+                ) : (
+                  <Lock className="w-3.5 h-3.5 text-[#d4af37]" />
+                )}
+                <span>{isAdminAuthenticated ? 'Admin Editor' : 'Admin Login'}</span>
+              </button>
+
+              {isAdminAuthenticated && (
+                <button
+                  onClick={logoutAdmin}
+                  title="Logout Admin"
+                  className="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-500/40 transition-colors"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Book Ministration Primary CTA */}
           <a
@@ -102,14 +120,16 @@ export const Navbar: React.FC = () => {
 
         {/* Mobile Menu Toggle */}
         <div className="flex sm:hidden items-center gap-2">
-          <button
-            onClick={() => setIsEditorOpen(true)}
-            className="p-2 text-zinc-300 hover:text-amber-300"
-            title="Customize Website"
-            id="mobile-edit-btn"
-          >
-            <SlidersHorizontal className="w-5 h-5 text-[#d4af37]" />
-          </button>
+          {(isAdminMode || isAdminAuthenticated) && (
+            <button
+              onClick={openCustomizer}
+              className="p-2 text-zinc-300 hover:text-amber-300"
+              title="Admin Content Editor"
+              id="mobile-edit-btn"
+            >
+              <SlidersHorizontal className="w-5 h-5 text-[#d4af37]" />
+            </button>
+          )}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-zinc-300 hover:text-[#e6c364] focus:outline-none"

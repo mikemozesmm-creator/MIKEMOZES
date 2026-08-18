@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, Heart, Disc, Sparkles } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Heart, Disc, Sparkles, MessageCircle, Youtube, Instagram, Facebook, Music, Share2, Twitter } from 'lucide-react';
 import { CrestLogo } from './CrestLogo';
 import { useMinistry } from '../context/MinistryContext';
 
 export const Footer: React.FC = () => {
-  const { ministryInfo, showToast, setIsEditorOpen } = useMinistry();
+  const { ministryInfo, showToast, isAdminMode, isAdminAuthenticated, openCustomizer, logoutAdmin } = useMinistry();
   const [newsletterEmail, setNewsletterEmail] = useState('');
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
@@ -41,53 +41,96 @@ export const Footer: React.FC = () => {
               "Lifting Praise, Transforming Generations."
             </div>
 
-            {/* Social Icons */}
-            <div className="flex items-center gap-3 pt-2">
-              <a
-                href={ministryInfo.socials.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-[#e6c364] hover:border-[#d4af37]/40 transition-colors"
-                title="YouTube Channel"
-              >
-                <span className="font-bold text-xs">YT</span>
-              </a>
-              <a
-                href={ministryInfo.socials.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-[#e6c364] hover:border-[#d4af37]/40 transition-colors"
-                title="Instagram"
-              >
-                <span className="font-bold text-xs">IG</span>
-              </a>
-              <a
-                href={ministryInfo.socials.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-[#e6c364] hover:border-[#d4af37]/40 transition-colors"
-                title="Facebook"
-              >
-                <span className="font-bold text-xs">FB</span>
-              </a>
-              <a
-                href={ministryInfo.socials.tiktok}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-[#e6c364] hover:border-[#d4af37]/40 transition-colors"
-                title="TikTok"
-              >
-                <span className="font-bold text-xs">TT</span>
-              </a>
-              <a
-                href={ministryInfo.socials.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-[#25D366] hover:border-emerald-500/40 transition-colors"
-                title="WhatsApp Hotline"
-              >
-                <span className="font-bold text-xs">WA</span>
-              </a>
+            {/* Dedicated Social Media Buttons */}
+            <div className="pt-2 space-y-2">
+              <span className="text-[11px] font-semibold text-[#fce999] uppercase tracking-wider block">
+                Connect With Us On Social Media
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                <a
+                  href={`https://wa.me/2348039675034?text=${encodeURIComponent("Hello De King's Family Music Ministry, I would like to connect.")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 hover:bg-emerald-900/80 text-emerald-300 flex items-center gap-2 transition-all text-xs font-medium shadow-md group hover:scale-[1.02]"
+                  title="WhatsApp: 08039675034"
+                >
+                  <MessageCircle className="w-4 h-4 text-emerald-400 group-hover:animate-bounce shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold font-mono text-[11px] leading-tight text-white">WhatsApp</span>
+                    <span className="text-[10px] text-emerald-400 font-mono truncate">08039675034</span>
+                  </div>
+                </a>
+
+                <a
+                  href={ministryInfo.socials.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2.5 rounded-xl bg-red-950/50 border border-red-500/40 hover:bg-red-900/70 text-red-300 flex items-center gap-2 transition-all text-xs font-medium shadow-md hover:scale-[1.02]"
+                  title="YouTube Channel"
+                >
+                  <Youtube className="w-4 h-4 text-red-500 shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-[11px] leading-tight text-white">YouTube</span>
+                    <span className="text-[10px] text-red-400 truncate">Watch Live</span>
+                  </div>
+                </a>
+
+                <a
+                  href={ministryInfo.socials.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2.5 rounded-xl bg-pink-950/50 border border-pink-500/40 hover:bg-pink-900/70 text-pink-300 flex items-center gap-2 transition-all text-xs font-medium shadow-md hover:scale-[1.02]"
+                  title="Instagram Page"
+                >
+                  <Instagram className="w-4 h-4 text-pink-400 shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-[11px] leading-tight text-white">Instagram</span>
+                    <span className="text-[10px] text-pink-400 truncate">@dekingsfamily</span>
+                  </div>
+                </a>
+
+                <a
+                  href={ministryInfo.socials.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2.5 rounded-xl bg-blue-950/50 border border-blue-500/40 hover:bg-blue-900/70 text-blue-300 flex items-center gap-2 transition-all text-xs font-medium shadow-md hover:scale-[1.02]"
+                  title="Facebook Ministry"
+                >
+                  <Facebook className="w-4 h-4 text-blue-400 shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-[11px] leading-tight text-white">Facebook</span>
+                    <span className="text-[10px] text-blue-400 truncate">Ministry Page</span>
+                  </div>
+                </a>
+
+                <a
+                  href={ministryInfo.socials.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-zinc-200 flex items-center gap-2 transition-all text-xs font-medium shadow-md hover:scale-[1.02]"
+                  title="TikTok Handle"
+                >
+                  <Music className="w-4 h-4 text-zinc-100 shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-[11px] leading-tight text-white">TikTok</span>
+                    <span className="text-[10px] text-zinc-400 truncate">Worship Clips</span>
+                  </div>
+                </a>
+
+                <a
+                  href={ministryInfo.socials.twitter || "https://x.com/dekingsmusic"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-[#d4af37]/50 text-[#fce999] flex items-center gap-2 transition-all text-xs font-medium shadow-md hover:scale-[1.02]"
+                  title="X / Twitter"
+                >
+                  <Twitter className="w-4 h-4 text-[#d4af37] shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-[11px] leading-tight text-white">X (Twitter)</span>
+                    <span className="text-[10px] text-[#fce999] truncate">Updates</span>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -150,20 +193,40 @@ export const Footer: React.FC = () => {
               </div>
             </form>
 
-            <button
-              onClick={() => setIsEditorOpen(true)}
-              className="mt-3 text-[11px] text-[#e6c364] hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <Sparkles className="w-3 h-3" /> Customize Ministry Content
-            </button>
+            {(isAdminMode || isAdminAuthenticated) && (
+              <div className="pt-2 flex items-center gap-3">
+                <button
+                  onClick={openCustomizer}
+                  className="text-[11px] text-[#fce999] hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  <Sparkles className="w-3 h-3 text-[#d4af37]" />
+                  <span>{isAdminAuthenticated ? 'Open Admin Editor' : 'Login to Admin Editor'}</span>
+                </button>
+                {isAdminAuthenticated && (
+                  <button
+                    onClick={logoutAdmin}
+                    className="text-[10px] text-zinc-500 hover:text-red-400 underline"
+                  >
+                    Logout
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
         </div>
 
         {/* Bottom Copyright */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <div>
-            © {new Date().getFullYear()} {ministryInfo.ministryName}. All rights reserved.
+          <div className="flex items-center gap-3">
+            <span>© {new Date().getFullYear()} {ministryInfo.ministryName}. All rights reserved.</span>
+            <a
+              href="#admin"
+              className="text-[10px] text-zinc-700 hover:text-zinc-400 transition-colors"
+              title="Admin Portal Access"
+            >
+              Admin
+            </a>
           </div>
           <div className="flex items-center gap-1 text-[#d4af37] text-xs">
             <span>To God Alone Be All The Glory Forever & Ever</span>

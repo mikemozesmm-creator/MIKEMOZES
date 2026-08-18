@@ -16,10 +16,12 @@ import { BookingSection } from './components/BookingSection';
 import { GivingSection } from './components/GivingSection';
 import { Footer } from './components/Footer';
 import { PersistentAudioPlayer } from './components/PersistentAudioPlayer';
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { LyricsModal } from './components/LyricsModal';
 import { ChordsModal } from './components/ChordsModal';
 import { BookingSuccessModal } from './components/BookingSuccessModal';
 import { ContentEditorModal } from './components/ContentEditorModal';
+import { AdminLoginModal } from './components/AdminLoginModal';
 import { CheckCircle2, Bell } from 'lucide-react';
 
 const ToastNotification: React.FC = () => {
@@ -62,11 +64,15 @@ const MinistryApp: React.FC = () => {
       {/* Floating Bottom Worship Synthesizer & Audio Player */}
       <PersistentAudioPlayer />
 
+      {/* Floating Hovering WhatsApp Hotline Button */}
+      <FloatingWhatsApp />
+
       {/* Interactive Modals */}
       <LyricsModal />
       <ChordsModal />
       <BookingSuccessModal />
       <ContentEditorModal />
+      <AdminLoginModal />
 
       {/* Toast Notification Container */}
       <ToastNotification />

@@ -369,7 +369,7 @@ export const ContentEditorModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
                     Account Number
@@ -389,17 +389,6 @@ export const ContentEditorModal: React.FC = () => {
                     type="text"
                     value={localInfo.banking.sortCode || ''}
                     onChange={(e) => setLocalInfo({ ...localInfo, banking: { ...localInfo.banking, sortCode: e.target.value } })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white text-sm focus:outline-none focus:border-[#d4af37]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
-                    SWIFT / BIC Code
-                  </label>
-                  <input
-                    type="text"
-                    value={localInfo.banking.swiftCode || ''}
-                    onChange={(e) => setLocalInfo({ ...localInfo, banking: { ...localInfo.banking, swiftCode: e.target.value } })}
                     className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white text-sm focus:outline-none focus:border-[#d4af37]"
                   />
                 </div>

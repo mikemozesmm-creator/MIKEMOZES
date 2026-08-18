@@ -162,6 +162,23 @@ For inquiries: ${ministryInfo.email} | Phone: ${ministryInfo.phone}
                 </div>
 
                 <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-950/60 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-emerald-400 uppercase tracking-wider font-semibold">WhatsApp Booking & Prayer</div>
+                    <a
+                      href="https://wa.me/2348039675034?text=Hello%20De%20King's%20Family%20Music%20Ministry,%20I%20would%20like%20to%20connect%20with%20you."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white hover:text-emerald-300 font-mono font-medium block"
+                    >
+                      08039675034
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-[#221c0e] border border-[#d4af37]/30 flex items-center justify-center text-[#e6c364] shrink-0 mt-0.5">
                     <Mail className="w-4 h-4" />
                   </div>
