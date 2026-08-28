@@ -37,8 +37,8 @@ export const Footer: React.FC = () => {
             <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-sm">
               {ministryInfo.vision}
             </p>
-            <div className="text-xs text-[#e6c364] font-serif italic">
-              "Lifting Praise, Transforming Generations."
+            <div className="text-xs text-[#e6c364] font-serif italic tracking-wide uppercase">
+              "Bringing Nations Before God in Worship."
             </div>
 
             {/* Dedicated Social Media Buttons */}

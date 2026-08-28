@@ -72,7 +72,7 @@ interface MinistryContextType {
 
 const MinistryContext = createContext<MinistryContextType | undefined>(undefined);
 
-const STORAGE_KEY = "dekings_ministry_content_v3";
+const STORAGE_KEY = "dekings_ministry_content_v4";
 
 export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Load saved content or defaults

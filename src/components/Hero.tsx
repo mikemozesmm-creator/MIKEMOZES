@@ -35,14 +35,14 @@ export const Hero: React.FC = () => {
         </div>
 
         {/* Main Title */}
-        <h1 className="font-cinzel text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight max-w-5xl leading-[1.1] mb-6">
+        <h1 className="font-cinzel text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-5xl leading-[1.1] mb-6">
           <span className="text-gold-gradient block drop-shadow-[0_4px_20px_rgba(212,175,55,0.3)]">
-            Lifting Praise,
+            BRINGING NATIONS
           </span>
           <span className="text-white font-serif italic font-normal block sm:inline">
-            Transforming
+            BEFORE GOD
           </span>{' '}
-          <span className="text-[#fce999]">Generations</span>
+          <span className="text-[#fce999]">IN WORSHIP</span>
         </h1>
 
         {/* Subtitle / Ministry Motto */}

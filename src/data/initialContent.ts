@@ -2,7 +2,7 @@ import { Album, EventItem, LeaderProfile, MinistryInfo, ScriptureItem, Testimony
 
 export const initialMinistryInfo: MinistryInfo = {
   ministryName: "De King's Family Music Ministry",
-  tagline: "Lifting Praise, Transforming Generations",
+  tagline: "BRINGING NATIONS BEFORE GOD IN WORSHIP",
   motto: "Worship in Spirit and in Truth — John 4:24",
   vision: "To ignite an unquenchable fire of prophetic worship, sound biblical praise, and transform lives across nations through heavenly melodies.",
   mission: "Equipping worshipers, raising an army of praise warriors, releasing spirit-breathed anthems, and ministering the presence, power, and glory of Jesus Christ to every generation.",
