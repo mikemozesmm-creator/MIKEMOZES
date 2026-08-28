@@ -218,15 +218,8 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Copyright */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <div className="flex items-center gap-3">
-            <span>© {new Date().getFullYear()} {ministryInfo.ministryName}. All rights reserved.</span>
-            <a
-              href="#admin"
-              className="text-[10px] text-zinc-700 hover:text-zinc-400 transition-colors"
-              title="Admin Portal Access"
-            >
-              Admin
-            </a>
+          <div>
+            © {new Date().getFullYear()} {ministryInfo.ministryName}. All rights reserved.
           </div>
           <div className="flex items-center gap-1 text-[#d4af37] text-xs">
             <span>To God Alone Be All The Glory Forever & Ever</span>

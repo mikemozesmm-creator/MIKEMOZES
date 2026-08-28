@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { X, Lock, KeyRound, ShieldAlert, ArrowRight, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { X, Lock, KeyRound, ShieldAlert, ArrowRight, Eye, EyeOff, Mail, UserCheck } from 'lucide-react';
 import { useMinistry } from '../context/MinistryContext';
 
 export const AdminLoginModal: React.FC = () => {
   const { isAdminLoginModalOpen, setIsAdminLoginModalOpen, loginAdmin } = useMinistry();
+  const [username, setUsername] = useState('mikemozesmm@gmail');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -13,9 +14,9 @@ export const AdminLoginModal: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    const success = loginAdmin(password);
+    const success = loginAdmin(username, password);
     if (!success) {
-      setErrorMsg('Invalid admin password. Access denied.');
+      setErrorMsg('Invalid admin username or password. Access denied.');
       setPassword('');
     }
   };
@@ -43,19 +44,43 @@ export const AdminLoginModal: React.FC = () => {
             <Lock className="w-7 h-7" />
           </div>
           <span className="text-[10px] uppercase tracking-[0.25em] text-[#fce999] font-bold">
-            Restricted Access
+            Restricted Administrator Access
           </span>
           <h3 className="font-cinzel text-2xl font-bold text-white mt-1">
             Ministry Admin Portal
           </h3>
           <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
-            Please enter the administrator password to manage songs, events, contacts, and ministry information.
+            Please enter your administrator username / email and password to access the content management system.
           </p>
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           
+          {/* Username / Email Field */}
+          <div>
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">
+              Admin Username / Email
+            </label>
+            <div className="relative">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500">
+                <Mail className="w-4 h-4" />
+              </div>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setErrorMsg('');
+                }}
+                placeholder="mikemozesmm@gmail"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700/90 text-white text-sm focus:outline-none focus:border-[#d4af37] placeholder-zinc-600 font-sans"
+              />
+            </div>
+          </div>
+
+          {/* Password Field */}
           <div>
             <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">
               Admin Password
@@ -79,7 +104,7 @@ export const AdminLoginModal: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white cursor-pointer"
                 title={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -96,15 +121,16 @@ export const AdminLoginModal: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3.5 rounded-xl bg-gold-gradient text-[#09090b] font-bold text-xs uppercase tracking-wider hover:brightness-110 shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full py-3.5 rounded-xl bg-gold-gradient text-[#09090b] font-bold text-xs uppercase tracking-wider hover:brightness-110 shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer mt-2"
           >
             <span>Unlock Admin Portal</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-zinc-800 text-[11px] text-zinc-500 text-center">
-          URL Mode Active: <span className="text-[#fce999] font-mono font-bold">/#admin</span>
+        <div className="mt-6 pt-4 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500">
+          <span>Protected by Ministry Security</span>
+          <span className="font-mono text-zinc-400">/#admin</span>
         </div>
 
       </div>

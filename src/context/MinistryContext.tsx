@@ -56,7 +56,7 @@ interface MinistryContextType {
   isAdminAuthenticated: boolean;
   isAdminLoginModalOpen: boolean;
   setIsAdminLoginModalOpen: (open: boolean) => void;
-  loginAdmin: (password: string) => boolean;
+  loginAdmin: (username: string, password: string) => boolean;
   logoutAdmin: () => void;
   openCustomizer: () => void;
 
@@ -142,12 +142,19 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const loginAdmin = (password: string): boolean => {
-    if (password === 'mikemozes7777') {
+  const loginAdmin = (username: string, password: string): boolean => {
+    const cleanUser = username.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    // Accept mikemozesmm@gmail or mikemozesmm@gmail.com
+    const isValidUser = cleanUser === 'mikemozesmm@gmail' || cleanUser === 'mikemozesmm@gmail.com';
+    const isValidPass = cleanPass === 'mikemozes7777';
+
+    if (isValidUser && isValidPass) {
       setIsAdminAuthenticated(true);
       sessionStorage.setItem("dekings_admin_auth", "true");
       setIsAdminLoginModalOpen(false);
-      showToast("Access Granted: Welcome Admin!");
+      showToast("Access Granted: Welcome Minister Mike Moses!");
       setIsEditorOpen(true);
       return true;
     } else {
