@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Play, Pause, Disc, FileText, Music2, ExternalLink, Sparkles, Filter, Sliders, Volume2, Share2 } from 'lucide-react';
 import { useMinistry } from '../context/MinistryContext';
 import { Track } from '../types';
+import { AdBanner } from './AdBanner';
 
 export const MusicShowcase: React.FC = () => {
   const { tracks, albums, currentTrack, isPlaying, playTrack, togglePlay, openLyrics, openChords, showToast } = useMinistry();
@@ -316,6 +317,9 @@ export const MusicShowcase: React.FC = () => {
             ))}
           </div>
         )}
+
+        {/* Music Section Google Ads In-Feed Unit */}
+        <AdBanner placement="music-feed" className="mt-12" />
 
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { Album, EventItem, LeaderProfile, MinistryInfo, ScriptureItem, Testimony, Track } from '../types';
+import { Album, EventItem, GoogleAdsSettings, LeaderProfile, MinistryInfo, ScriptureItem, Testimony, Track } from '../types';
 
 export const initialMinistryInfo: MinistryInfo = {
   ministryName: "De King's Family Music Ministry",
@@ -418,3 +418,21 @@ export const initialLeaders: LeaderProfile[] = [
     image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80"
   }
 ];
+
+export const initialGoogleAdsSettings: GoogleAdsSettings = {
+  enabled: true,
+  publisherId: "ca-pub-0000000000000000",
+  adsConversionId: "",
+  autoAds: true,
+  testMode: true,
+  showTopBanner: true,
+  showMidSectionBanner: true,
+  showMusicSectionBanner: true,
+  showFooterBanner: true,
+  topBannerSlotId: "1234567890",
+  midSectionSlotId: "2345678901",
+  musicSectionSlotId: "3456789012",
+  footerBannerSlotId: "4567890123",
+  adsTxtContent: "google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0"
+};
+

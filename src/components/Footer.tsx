@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, Heart, Disc, Sparkles, MessageCircle, Youtube, Instagram, Facebook, Music, Share2, Twitter } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Heart, Disc, Sparkles, MessageCircle, Youtube, Instagram, Facebook, Music, Share2, Twitter, ShieldCheck, FileText, Cookie } from 'lucide-react';
 import { CrestLogo } from './CrestLogo';
 import { useMinistry } from '../context/MinistryContext';
+import { AdBanner } from './AdBanner';
 
 export const Footer: React.FC = () => {
-  const { ministryInfo, showToast, isAdminMode, isAdminAuthenticated, openCustomizer, logoutAdmin } = useMinistry();
+  const { ministryInfo, showToast, isAdminMode, isAdminAuthenticated, openCustomizer, logoutAdmin, openPrivacyModal, openTermsModal } = useMinistry();
   const [newsletterEmail, setNewsletterEmail] = useState('');
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
@@ -15,7 +16,11 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer id="ministry-footer" className="bg-[#070709] border-t border-zinc-800 text-zinc-400 pt-16 pb-28">
+    <footer id="ministry-footer" className="bg-[#070709] border-t border-zinc-800 text-zinc-400 pt-10 pb-28">
+      
+      {/* Pre-Footer Google Ad Placement */}
+      <AdBanner placement="footer-banner" className="mb-10" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Main Footer Grid */}
@@ -216,10 +221,24 @@ export const Footer: React.FC = () => {
 
         </div>
 
-        {/* Bottom Copyright */}
+        {/* Bottom Copyright & Legal Links */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <div>
-            © {new Date().getFullYear()} {ministryInfo.ministryName}. All rights reserved.
+          <div className="flex flex-wrap items-center gap-4">
+            <span>© {new Date().getFullYear()} {ministryInfo.ministryName}. All rights reserved.</span>
+            <span className="hidden sm:inline">•</span>
+            <button
+              onClick={openPrivacyModal}
+              className="text-zinc-400 hover:text-[#fce999] hover:underline cursor-pointer transition-colors"
+            >
+              Privacy & Cookie Policy
+            </button>
+            <span>•</span>
+            <button
+              onClick={openTermsModal}
+              className="text-zinc-400 hover:text-[#fce999] hover:underline cursor-pointer transition-colors"
+            >
+              Terms of Service
+            </button>
           </div>
           <div className="flex items-center gap-1 text-[#d4af37] text-xs">
             <span>To God Alone Be All The Glory Forever & Ever</span>

@@ -134,3 +134,20 @@ export interface PrayerRequestData {
   details: string;
   isConfidential: boolean;
 }
+
+export interface GoogleAdsSettings {
+  enabled: boolean;
+  publisherId: string; // e.g. ca-pub-1234567890123456
+  adsConversionId: string; // e.g. AW-123456789 or G-123456789
+  autoAds: boolean;
+  testMode: boolean;
+  showTopBanner: boolean;
+  showMidSectionBanner: boolean;
+  showMusicSectionBanner: boolean;
+  showFooterBanner: boolean;
+  topBannerSlotId: string;
+  midSectionSlotId: string;
+  musicSectionSlotId: string;
+  footerBannerSlotId: string;
+  adsTxtContent: string;
+}

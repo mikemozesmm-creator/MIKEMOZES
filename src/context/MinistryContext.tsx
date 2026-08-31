@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Album, BookingFormData, EventItem, MinistryInfo, PrayerRequestData, ScriptureItem, Testimony, Track } from '../types';
-import { initialAlbums, initialEvents, initialMinistryInfo, initialScriptures, initialTestimonies, initialTracks } from '../data/initialContent';
+import { Album, BookingFormData, EventItem, GoogleAdsSettings, MinistryInfo, PrayerRequestData, ScriptureItem, Testimony, Track } from '../types';
+import { initialAlbums, initialEvents, initialGoogleAdsSettings, initialMinistryInfo, initialScriptures, initialTestimonies, initialTracks } from '../data/initialContent';
 import { worshipAudio } from '../utils/audioSynth';
 
 interface MinistryContextType {
@@ -10,12 +10,14 @@ interface MinistryContextType {
   events: EventItem[];
   scriptures: ScriptureItem[];
   testimonies: Testimony[];
+  googleAds: GoogleAdsSettings;
   
   // Customization & editing methods
   updateMinistryInfo: (info: Partial<MinistryInfo>) => void;
   updateTracks: (tracks: Track[]) => void;
   updateEvents: (events: EventItem[]) => void;
   updateScriptures: (scriptures: ScriptureItem[]) => void;
+  updateGoogleAds: (settings: GoogleAdsSettings) => void;
   resetToDefaults: () => void;
   exportContentJson: () => void;
   importContentJson: (jsonData: string) => boolean;
@@ -48,6 +50,14 @@ interface MinistryContextType {
   chordsTrack: Track | null;
   openChords: (track: Track) => void;
 
+  isPrivacyModalOpen: boolean;
+  setIsPrivacyModalOpen: (open: boolean) => void;
+  openPrivacyModal: () => void;
+
+  isTermsModalOpen: boolean;
+  setIsTermsModalOpen: (open: boolean) => void;
+  openTermsModal: () => void;
+
   isEditorOpen: boolean;
   setIsEditorOpen: (open: boolean) => void;
 
@@ -66,6 +76,7 @@ interface MinistryContextType {
   submitBooking: (data: BookingFormData) => Promise<boolean>;
 
   submitPrayerRequest: (data: PrayerRequestData) => Promise<boolean>;
+  triggerAdConversion: (eventName: string, params?: Record<string, any>) => void;
   toastMessage: string | null;
   showToast: (msg: string) => void;
 }
@@ -100,6 +111,11 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const [testimonies] = useState<Testimony[]>(initialTestimonies);
 
+  const [googleAds, setGoogleAds] = useState<GoogleAdsSettings>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY + "_google_ads");
+    return saved ? JSON.parse(saved) : initialGoogleAdsSettings;
+  });
+
   // Music Player States
   const [currentTrack, setCurrentTrack] = useState<Track>(tracks[0] || initialTracks[0]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -114,6 +130,9 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [isChordsModalOpen, setIsChordsModalOpen] = useState(false);
   const [chordsTrack, setChordsTrack] = useState<Track | null>(null);
 
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   // Admin & Security States
@@ -127,20 +146,97 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   useEffect(() => {
     const handleHashChange = () => {
-      const hasAdmin = window.location.hash.toLowerCase().includes('admin');
+      const hash = window.location.hash.toLowerCase();
+      const hasAdmin = hash.includes('admin');
       setIsAdminMode(hasAdmin);
       if (hasAdmin && !sessionStorage.getItem("dekings_admin_auth")) {
         setIsAdminLoginModalOpen(true);
       }
+
+      if (hash.includes('privacy')) {
+        setIsPrivacyModalOpen(true);
+      }
+      if (hash.includes('terms')) {
+        setIsTermsModalOpen(true);
+      }
     };
 
     window.addEventListener('hashchange', handleHashChange);
-    if (window.location.hash.toLowerCase().includes('admin') && !sessionStorage.getItem("dekings_admin_auth")) {
+    const initialHash = window.location.hash.toLowerCase();
+    if (initialHash.includes('admin') && !sessionStorage.getItem("dekings_admin_auth")) {
       setIsAdminLoginModalOpen(true);
+    }
+    if (initialHash.includes('privacy')) {
+      setIsPrivacyModalOpen(true);
+    }
+    if (initialHash.includes('terms')) {
+      setIsTermsModalOpen(true);
     }
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+
+  // Google AdSense & Google Tag script injection
+  useEffect(() => {
+    if (!googleAds.enabled) return;
+
+    // 1. Google AdSense script injection
+    const publisherId = googleAds.publisherId?.trim();
+    if (publisherId && publisherId.startsWith('ca-pub-') && !publisherId.includes('0000000000000000')) {
+      const existingAdSense = document.getElementById('google-adsense-script');
+      if (!existingAdSense) {
+        const script = document.createElement('script');
+        script.id = 'google-adsense-script';
+        script.async = true;
+        script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`;
+        script.crossOrigin = 'anonymous';
+        document.head.appendChild(script);
+      }
+    }
+
+    // 2. Google Ads Conversion & Remarketing (gtag.js) script injection
+    const conversionId = googleAds.adsConversionId?.trim();
+    if (conversionId) {
+      const existingGtag = document.getElementById('google-ads-gtag-script');
+      if (!existingGtag) {
+        const script = document.createElement('script');
+        script.id = 'google-ads-gtag-script';
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${conversionId}`;
+        document.head.appendChild(script);
+
+        // Init dataLayer
+        const inlineScript = document.createElement('script');
+        inlineScript.id = 'google-ads-gtag-init';
+        inlineScript.innerHTML = `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${conversionId}');
+        `;
+        document.head.appendChild(inlineScript);
+      }
+    }
+  }, [googleAds.enabled, googleAds.publisherId, googleAds.adsConversionId]);
+
+  const updateGoogleAds = (settings: GoogleAdsSettings) => {
+    setGoogleAds(settings);
+    localStorage.setItem(STORAGE_KEY + "_google_ads", JSON.stringify(settings));
+    showToast("Google Ads settings updated successfully!");
+  };
+
+  const openPrivacyModal = () => setIsPrivacyModalOpen(true);
+  const openTermsModal = () => setIsTermsModalOpen(true);
+
+  const triggerAdConversion = (eventName: string, params: Record<string, any> = {}) => {
+    try {
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', eventName, params);
+      }
+    } catch (err) {
+      console.warn('Ad conversion trigger error:', err);
+    }
+  };
 
   const loginAdmin = (username: string, password: string): boolean => {
     const cleanUser = username.trim().toLowerCase();
@@ -392,10 +488,12 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
         events,
         scriptures,
         testimonies,
+        googleAds,
         updateMinistryInfo,
         updateTracks,
         updateEvents,
         updateScriptures,
+        updateGoogleAds,
         resetToDefaults,
         exportContentJson,
         importContentJson,
@@ -422,6 +520,12 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
         setIsChordsModalOpen,
         chordsTrack,
         openChords,
+        isPrivacyModalOpen,
+        setIsPrivacyModalOpen,
+        openPrivacyModal,
+        isTermsModalOpen,
+        setIsTermsModalOpen,
+        openTermsModal,
         isEditorOpen,
         setIsEditorOpen,
         isAdminMode,
@@ -436,6 +540,7 @@ export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }
         lastBookingSubmission,
         submitBooking,
         submitPrayerRequest,
+        triggerAdConversion,
         toastMessage,
         showToast
       }}

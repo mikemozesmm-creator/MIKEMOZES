@@ -22,6 +22,10 @@ import { ChordsModal } from './components/ChordsModal';
 import { BookingSuccessModal } from './components/BookingSuccessModal';
 import { ContentEditorModal } from './components/ContentEditorModal';
 import { AdminLoginModal } from './components/AdminLoginModal';
+import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
+import { TermsModal } from './components/TermsModal';
+import { CookieConsentBanner } from './components/CookieConsentBanner';
+import { AdBanner } from './components/AdBanner';
 import { CheckCircle2, Bell } from 'lucide-react';
 
 const ToastNotification: React.FC = () => {
@@ -49,10 +53,18 @@ const MinistryApp: React.FC = () => {
       {/* Main Page Content Flow */}
       <main className="flex-1">
         <Hero />
+        
+        {/* Top Google Ads Banner */}
+        <AdBanner placement="top-banner" className="my-8" />
+
         <AboutSection />
         <WorshipImpactSection />
         <MusicShowcase />
         <EventsSection />
+
+        {/* Mid-Section Google Ads Banner */}
+        <AdBanner placement="mid-section" className="my-10" />
+
         <ScriptureVisionSection />
         <BookingSection />
         <GivingSection />
@@ -73,6 +85,11 @@ const MinistryApp: React.FC = () => {
       <BookingSuccessModal />
       <ContentEditorModal />
       <AdminLoginModal />
+      <PrivacyPolicyModal />
+      <TermsModal />
+
+      {/* Cookie Consent Policy Banner */}
+      <CookieConsentBanner />
 
       {/* Toast Notification Container */}
       <ToastNotification />

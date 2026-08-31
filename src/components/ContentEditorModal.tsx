@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { X, SlidersHorizontal, Download, Upload, RotateCcw, Save, Plus, Trash2, Edit3, CheckCircle2, Music, Calendar, Phone, Landmark, Sparkles } from 'lucide-react';
+import { X, SlidersHorizontal, Download, Upload, RotateCcw, Save, Plus, Trash2, Edit3, CheckCircle2, Music, Calendar, Phone, Landmark, Sparkles, Megaphone, Copy, ExternalLink, ShieldAlert, Check } from 'lucide-react';
 import { useMinistry } from '../context/MinistryContext';
-import { EventItem, MinistryInfo, Track } from '../types';
+import { EventItem, GoogleAdsSettings, MinistryInfo, Track } from '../types';
 
 export const ContentEditorModal: React.FC = () => {
   const {
@@ -13,16 +13,20 @@ export const ContentEditorModal: React.FC = () => {
     updateTracks,
     events,
     updateEvents,
+    googleAds,
+    updateGoogleAds,
     resetToDefaults,
     exportContentJson,
     importContentJson,
     showToast
   } = useMinistry();
 
-  const [activeTab, setActiveTab] = useState<'info' | 'contacts' | 'banking' | 'tracks' | 'events'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'contacts' | 'banking' | 'tracks' | 'events' | 'ads'>('info');
   const [localInfo, setLocalInfo] = useState<MinistryInfo>(ministryInfo);
   const [localTracks, setLocalTracks] = useState<Track[]>(tracks);
   const [localEvents, setLocalEvents] = useState<EventItem[]>(events);
+  const [localGoogleAds, setLocalGoogleAds] = useState<GoogleAdsSettings>(googleAds);
+  const [copiedAdsTxt, setCopiedAdsTxt] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isEditorOpen) return null;
@@ -31,8 +35,29 @@ export const ContentEditorModal: React.FC = () => {
     updateMinistryInfo(localInfo);
     updateTracks(localTracks);
     updateEvents(localEvents);
-    showToast("All custom ministry content saved successfully!");
+    updateGoogleAds(localGoogleAds);
+    showToast("All custom ministry content and Google Ads settings saved!");
     setIsEditorOpen(false);
+  };
+
+  const handleCopyAdsTxt = () => {
+    navigator.clipboard.writeText(localGoogleAds.adsTxtContent);
+    setCopiedAdsTxt(true);
+    showToast("ads.txt content copied to clipboard!");
+    setTimeout(() => setCopiedAdsTxt(false), 3000);
+  };
+
+  const handleDownloadAdsTxt = () => {
+    const blob = new Blob([localGoogleAds.adsTxtContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'ads.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast("ads.txt file downloaded!");
   };
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,6 +157,7 @@ export const ContentEditorModal: React.FC = () => {
             { id: 'banking', label: 'Bank Giving Info', icon: Landmark },
             { id: 'tracks', label: `Songs & Tracks (${localTracks.length})`, icon: Music },
             { id: 'events', label: `Events (${localEvents.length})`, icon: Calendar },
+            { id: 'ads', label: 'Google Ads & AdSense', icon: Megaphone },
           ].map(tab => {
             const Icon = tab.icon;
             return (
@@ -627,6 +653,257 @@ export const ContentEditorModal: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'ads' && (
+            <div className="space-y-6 animate-in fade-in duration-200">
+              
+              {/* Notice Banner */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#221c0e] to-zinc-900 border border-[#d4af37]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#2a220e] border border-[#d4af37]/60 flex items-center justify-center text-[#e6c364] shrink-0 mt-0.5">
+                    <Megaphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-cinzel text-base font-bold text-white">
+                      Google Ads & Google AdSense Engine
+                    </h4>
+                    <p className="text-xs text-zinc-300 leading-relaxed mt-0.5">
+                      Monetize your website traffic, run Google Ads outreach campaigns, and manage policy-compliant ad units and <code className="text-[#fce999]">ads.txt</code> verification.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Master Switch */}
+                <div className="flex items-center gap-3 self-end sm:self-center bg-zinc-900/90 px-4 py-2 rounded-xl border border-zinc-700">
+                  <span className="text-xs font-semibold text-zinc-200">
+                    {localGoogleAds.enabled ? 'Ads Active' : 'Ads Disabled'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setLocalGoogleAds({ ...localGoogleAds, enabled: !localGoogleAds.enabled })}
+                    className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
+                      localGoogleAds.enabled ? 'bg-emerald-600' : 'bg-zinc-700'
+                    }`}
+                  >
+                    <div
+                      className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${
+                        localGoogleAds.enabled ? 'right-1' : 'left-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Core Credentials Section */}
+              <div className="p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-4">
+                <h5 className="font-cinzel text-sm font-bold text-[#fce999] uppercase tracking-wider flex items-center gap-2">
+                  <span>1. Google Account & Verification Credentials</span>
+                </h5>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+                      Google AdSense Publisher ID (Client ID)
+                    </label>
+                    <input
+                      type="text"
+                      value={localGoogleAds.publisherId}
+                      onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, publisherId: e.target.value })}
+                      placeholder="ca-pub-1234567890123456"
+                      className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-700 text-white text-xs sm:text-sm font-mono focus:outline-none focus:border-[#d4af37]"
+                    />
+                    <span className="text-[11px] text-zinc-400 mt-1 block">
+                      Found in your Google AdSense dashboard under <em>Account &gt; Settings &gt; Publisher ID</em>.
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1">
+                      Google Ads Conversion / Google Tag ID (gtag.js)
+                    </label>
+                    <input
+                      type="text"
+                      value={localGoogleAds.adsConversionId}
+                      onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, adsConversionId: e.target.value })}
+                      placeholder="AW-123456789 or G-XXXXXXXXXX"
+                      className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-700 text-white text-xs sm:text-sm font-mono focus:outline-none focus:border-[#d4af37]"
+                    />
+                    <span className="text-[11px] text-zinc-400 mt-1 block">
+                      Used for Google Ads campaign conversion tracking, remarketing, and analytics.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-6 pt-2 border-t border-zinc-800 text-xs text-zinc-300">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={localGoogleAds.autoAds}
+                      onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, autoAds: e.target.checked })}
+                      className="w-4 h-4 rounded text-[#d4af37] focus:ring-0 bg-zinc-900 border-zinc-700"
+                    />
+                    <span>Enable Google AdSense <strong>Auto Ads</strong> (automated AI placement)</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={localGoogleAds.testMode}
+                      onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, testMode: e.target.checked })}
+                      className="w-4 h-4 rounded text-[#d4af37] focus:ring-0 bg-zinc-900 border-zinc-700"
+                    />
+                    <span><strong>Test / Safe Preview Mode</strong> (prevents accidental invalid clicks)</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Ad Placement Slots Configuration */}
+              <div className="p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-4">
+                <h5 className="font-cinzel text-sm font-bold text-[#fce999] uppercase tracking-wider">
+                  2. Targeted Responsive Ad Placements
+                </h5>
+                <p className="text-xs text-zinc-400">
+                  Toggle and customize individual ad positions throughout the homepage:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  {/* Slot 1: Top Leaderboard */}
+                  <div className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-white">Top Banner (Below Hero)</span>
+                      <input
+                        type="checkbox"
+                        checked={localGoogleAds.showTopBanner}
+                        onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, showTopBanner: e.target.checked })}
+                        className="w-4 h-4"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={localGoogleAds.topBannerSlotId}
+                      onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, topBannerSlotId: e.target.value })}
+                      placeholder="Ad Unit Slot ID (e.g. 1234567890)"
+                      className="w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-white font-mono text-[11px]"
+                    />
+                  </div>
+
+                  {/* Slot 2: Mid Section */}
+                  <div className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-white">Mid-Page Banner (Between Sections)</span>
+                      <input
+                        type="checkbox"
+                        checked={localGoogleAds.showMidSectionBanner}
+                        onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, showMidSectionBanner: e.target.checked })}
+                        className="w-4 h-4"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={localGoogleAds.midSectionSlotId}
+                      onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, midSectionSlotId: e.target.value })}
+                      placeholder="Ad Unit Slot ID (e.g. 2345678901)"
+                      className="w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-white font-mono text-[11px]"
+                    />
+                  </div>
+
+                  {/* Slot 3: Music Showcase */}
+                  <div className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-white">Music & Track Showcase Divider</span>
+                      <input
+                        type="checkbox"
+                        checked={localGoogleAds.showMusicSectionBanner}
+                        onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, showMusicSectionBanner: e.target.checked })}
+                        className="w-4 h-4"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={localGoogleAds.musicSectionSlotId}
+                      onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, musicSectionSlotId: e.target.value })}
+                      placeholder="Ad Unit Slot ID (e.g. 3456789012)"
+                      className="w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-white font-mono text-[11px]"
+                    />
+                  </div>
+
+                  {/* Slot 4: Footer */}
+                  <div className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-white">Pre-Footer Leaderboard Banner</span>
+                      <input
+                        type="checkbox"
+                        checked={localGoogleAds.showFooterBanner}
+                        onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, showFooterBanner: e.target.checked })}
+                        className="w-4 h-4"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={localGoogleAds.footerBannerSlotId}
+                      onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, footerBannerSlotId: e.target.value })}
+                      placeholder="Ad Unit Slot ID (e.g. 4567890123)"
+                      className="w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-white font-mono text-[11px]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ads.txt Authorization Editor */}
+              <div className="p-5 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div>
+                    <h5 className="font-cinzel text-sm font-bold text-[#fce999] uppercase tracking-wider">
+                      3. Google Crawler <span className="font-mono">ads.txt</span> Verification
+                    </h5>
+                    <p className="text-xs text-zinc-400">
+                      Google crawlers verify ownership via <code className="text-[#fce999]">/ads.txt</code>. Keep this file updated with your publisher ID:
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleCopyAdsTxt}
+                      className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-200 flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedAdsTxt ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-[#d4af37]" />}
+                      <span>{copiedAdsTxt ? 'Copied' : 'Copy ads.txt'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDownloadAdsTxt}
+                      className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-200 flex items-center gap-1 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5 text-[#d4af37]" />
+                      <span>Download .txt</span>
+                    </button>
+                  </div>
+                </div>
+
+                <textarea
+                  rows={2}
+                  value={localGoogleAds.adsTxtContent}
+                  onChange={(e) => setLocalGoogleAds({ ...localGoogleAds, adsTxtContent: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-700 text-emerald-400 font-mono text-xs focus:outline-none focus:border-[#d4af37]"
+                />
+              </div>
+
+              {/* Quick Setup Checklist */}
+              <div className="p-4 rounded-xl bg-[#14120c] border border-[#d4af37]/30 text-xs text-zinc-300 space-y-2">
+                <div className="font-bold text-[#fce999] flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-[#d4af37]" />
+                  <span>Google Ads & AdSense Policy Checklist Complete</span>
+                </div>
+                <ul className="list-disc list-inside space-y-1 text-zinc-400 pl-1 text-[11px]">
+                  <li><strong>Privacy Policy & Cookie Consent:</strong> Fully integrated with DART cookie disclosures and Google Ads opt-out links.</li>
+                  <li><strong>Terms of Service:</strong> Compliant with intellectual property and donation policies.</li>
+                  <li><strong>Responsive Ad Slots:</strong> Labeled with required "Advertisement / Ministry Partner" disclosures.</li>
+                </ul>
+              </div>
+
             </div>
           )}
 
