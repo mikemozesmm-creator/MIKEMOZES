@@ -83,13 +83,24 @@ interface MinistryContextType {
 
 const MinistryContext = createContext<MinistryContextType | undefined>(undefined);
 
-const STORAGE_KEY = "dekings_ministry_content_v4";
+const STORAGE_KEY = "dekings_ministry_content_v5";
 
 export const MinistryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Load saved content or defaults
   const [ministryInfo, setMinistryInfo] = useState<MinistryInfo>(() => {
     const saved = localStorage.getItem(STORAGE_KEY + "_info");
-    return saved ? JSON.parse(saved) : initialMinistryInfo;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (!parsed.phone || parsed.phone.includes("749-KING")) {
+          parsed.phone = "08039675034";
+        }
+        return { ...initialMinistryInfo, ...parsed };
+      } catch (e) {
+        return initialMinistryInfo;
+      }
+    }
+    return initialMinistryInfo;
   });
 
   const [tracks, setTracks] = useState<Track[]>(() => {

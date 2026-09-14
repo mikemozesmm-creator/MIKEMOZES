@@ -49,9 +49,21 @@ export const Footer: React.FC = () => {
             {/* Dedicated Social Media Buttons */}
             <div className="pt-2 space-y-2">
               <span className="text-[11px] font-semibold text-[#fce999] uppercase tracking-wider block">
-                Connect With Us On Social Media
+                Connect With Us Directly
               </span>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                <a
+                  href={`tel:${ministryInfo.phone.replace(/[^0-9+]/g, '')}`}
+                  className="px-3 py-2.5 rounded-xl bg-[#221c0e] border border-[#d4af37]/40 hover:bg-[#2e2613] text-[#fce999] flex items-center gap-2 transition-all text-xs font-medium shadow-md group hover:scale-[1.02]"
+                  title={`General Enquiries: ${ministryInfo.phone}`}
+                >
+                  <Phone className="w-4 h-4 text-[#d4af37] group-hover:rotate-12 transition-transform shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-[11px] leading-tight text-white">Enquiries</span>
+                    <span className="text-[10px] text-[#e6c364] font-mono truncate">{ministryInfo.phone}</span>
+                  </div>
+                </a>
+
                 <a
                   href={`https://wa.me/2348039675034?text=${encodeURIComponent("Hello De King's Family Music Ministry, I would like to connect.")}`}
                   target="_blank"

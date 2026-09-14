@@ -156,8 +156,15 @@ For inquiries: ${ministryInfo.email} | Phone: ${ministryInfo.phone}
                   </div>
                   <div>
                     <div className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">General Inquiries</div>
-                    <div className="text-white font-medium">{ministryInfo.phone}</div>
-                    <div className="text-xs text-zinc-400">{ministryInfo.altPhone}</div>
+                    <a
+                      href={`tel:${ministryInfo.phone.replace(/[^0-9+]/g, '')}`}
+                      className="text-white font-medium hover:text-[#fce999] transition-colors block"
+                    >
+                      {ministryInfo.phone}
+                    </a>
+                    {ministryInfo.altPhone && (
+                      <div className="text-xs text-zinc-400">{ministryInfo.altPhone}</div>
+                    )}
                   </div>
                 </div>
 

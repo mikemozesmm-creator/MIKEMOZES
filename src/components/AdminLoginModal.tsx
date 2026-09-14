@@ -4,7 +4,7 @@ import { useMinistry } from '../context/MinistryContext';
 
 export const AdminLoginModal: React.FC = () => {
   const { isAdminLoginModalOpen, setIsAdminLoginModalOpen, loginAdmin } = useMinistry();
-  const [username, setUsername] = useState('mikemozesmm@gmail');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -69,12 +69,13 @@ export const AdminLoginModal: React.FC = () => {
               <input
                 type="text"
                 required
+                autoFocus
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
                   setErrorMsg('');
                 }}
-                placeholder="mikemozesmm@gmail"
+                placeholder="Enter admin email or username"
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700/90 text-white text-sm focus:outline-none focus:border-[#d4af37] placeholder-zinc-600 font-sans"
               />
             </div>
@@ -92,7 +93,6 @@ export const AdminLoginModal: React.FC = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                autoFocus
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
