@@ -162,6 +162,34 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="pt-4 border-t border-zinc-800 flex flex-col gap-3">
+            {(isAdminMode || isAdminAuthenticated) && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    openCustomizer();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-[#d4af37]/60 bg-[#1c180e] text-xs font-semibold text-[#fce999]"
+                >
+                  <SlidersHorizontal className="w-4 h-4 text-[#d4af37]" />
+                  <span>{isAdminAuthenticated ? 'Admin Dashboard' : 'Admin Login'}</span>
+                </button>
+                {isAdminAuthenticated && (
+                  <button
+                    onClick={() => {
+                      logoutAdmin();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-3 py-2.5 rounded-lg bg-red-950/50 border border-red-800/60 text-red-300 text-xs font-semibold flex items-center gap-1.5"
+                    title="Log Out"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-red-400" />
+                    <span>Log Out</span>
+                  </button>
+                )}
+              </div>
+            )}
+
             <button
               onClick={() => {
                 togglePlay();

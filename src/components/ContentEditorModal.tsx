@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, SlidersHorizontal, Download, Upload, RotateCcw, Save, Plus, Trash2, Edit3, CheckCircle2, Music, Calendar, Phone, Landmark, Sparkles, Megaphone, Copy, ExternalLink, ShieldAlert, Check } from 'lucide-react';
+import { X, SlidersHorizontal, Download, Upload, RotateCcw, Save, Plus, Trash2, Edit3, CheckCircle2, Music, Calendar, Phone, Landmark, Sparkles, Megaphone, Copy, ExternalLink, ShieldAlert, Check, LogOut } from 'lucide-react';
 import { useMinistry } from '../context/MinistryContext';
 import { EventItem, GoogleAdsSettings, MinistryInfo, Track } from '../types';
 
@@ -18,7 +18,8 @@ export const ContentEditorModal: React.FC = () => {
     resetToDefaults,
     exportContentJson,
     importContentJson,
-    showToast
+    showToast,
+    logoutAdmin
   } = useMinistry();
 
   const [activeTab, setActiveTab] = useState<'info' | 'contacts' | 'banking' | 'tracks' | 'events' | 'ads'>('info');
@@ -126,27 +127,51 @@ export const ContentEditorModal: React.FC = () => {
       <div className="bg-[#121217] border border-[#d4af37]/60 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
         
         {/* Header */}
-        <div className="p-6 border-b border-zinc-800 bg-[#17140e] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#2a220e] border border-[#d4af37]/40 flex items-center justify-center text-[#e6c364]">
+        <div className="p-5 sm:p-6 border-b border-zinc-800 bg-[#17140e] flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-[#2a220e] border border-[#d4af37]/40 flex items-center justify-center text-[#e6c364] shrink-0">
               <SlidersHorizontal className="w-5 h-5" />
             </div>
-            <div>
-              <h3 className="font-cinzel text-lg sm:text-xl font-bold text-white">
-                Live Ministry Content Customizer
-              </h3>
-              <p className="text-xs text-zinc-400">
-                Replace sample contacts, scriptures, songs, events, and bank giving details.
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h3 className="font-cinzel text-lg sm:text-xl font-bold text-white truncate">
+                  Admin Dashboard & Content Manager
+                </h3>
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded-md bg-[#2a220e] border border-[#d4af37]/50 text-[#fce999] text-[10px] font-mono uppercase tracking-wider font-semibold">
+                  Admin Active
+                </span>
+              </div>
+              <p className="text-xs text-zinc-400 truncate">
+                Update ministry profile, tracks, events, Google ads, and bank giving details.
               </p>
             </div>
           </div>
 
-          <button
-            onClick={() => setIsEditorOpen(false)}
-            className="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2.5 shrink-0">
+            {/* Log Out Button */}
+            <button
+              onClick={() => {
+                if (window.confirm("Are you sure you want to log out of the Admin Dashboard?")) {
+                  logoutAdmin();
+                }
+              }}
+              className="px-3 py-1.5 rounded-xl bg-red-950/50 hover:bg-red-900/70 border border-red-800/70 text-red-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm group"
+              title="Log out of Admin Dashboard"
+              id="admin-header-logout-btn"
+            >
+              <LogOut className="w-3.5 h-3.5 text-red-400 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Log Out</span>
+            </button>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setIsEditorOpen(false)}
+              className="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center cursor-pointer transition-colors"
+              title="Close Dashboard"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation Ribbon */}
@@ -955,14 +980,27 @@ export const ContentEditorModal: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => {
+                if (window.confirm("Are you sure you want to log out of the Admin Dashboard?")) {
+                  logoutAdmin();
+                }
+              }}
+              className="px-3 py-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-red-300 hover:text-white font-medium text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+              title="Log Out of Admin Session"
+              id="admin-footer-logout-btn"
+            >
+              <LogOut className="w-3.5 h-3.5 text-red-400" />
+              <span className="hidden sm:inline">Log Out</span>
+            </button>
+            <button
               onClick={() => setIsEditorOpen(false)}
-              className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium text-xs cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveAll}
-              className="px-6 py-2 rounded-xl bg-gold-gradient text-[#09090b] font-bold uppercase tracking-wider hover:brightness-110 flex items-center gap-2 shadow-md cursor-pointer"
+              className="px-6 py-2 rounded-xl bg-gold-gradient text-[#09090b] font-bold uppercase tracking-wider hover:brightness-110 flex items-center gap-2 shadow-md cursor-pointer text-xs"
             >
               <Save className="w-4 h-4" />
               <span>Save & Apply</span>
